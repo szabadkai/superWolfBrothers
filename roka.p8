@@ -159,7 +159,7 @@ end
 --assumes tile flag 0 or 1 == solid
 function collide_floor(self)
 	--only check for ground when falling.
-	if self.dy<0 then
+	if self.dy<0 or self.y >= (level+1) *128 -self.w/2 then
 		return false
 	end
 	local landed=false
@@ -657,8 +657,9 @@ function m_player(x,y)
 			elseif self.x>1018 then
 				self.x=1018
 			end
-			-- if self.y>128 then
-			-- 	dead=true
+			if self.y>=(level+1)*128-8 then
+				dead=true
+			end
 			if self.y<-5 then
 				self.y=-5
 			end
