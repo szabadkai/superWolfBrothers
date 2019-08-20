@@ -1,5 +1,5 @@
 pico-8 cartridge // http://www.pico-8.com
-version 16
+version 18
 __lua__
 snd=
 {
@@ -9,7 +9,7 @@ snd=
 }
 
 --music tracks
-music(0)
+
 startscreen=true
 goal=nil
 dead=false
@@ -18,12 +18,13 @@ waiting = false
 water={}
 pickups ={}
 coins = 0
-
+next = false
 backdrop={
 	{0	,102*8},
 	{8*66,1100}
 }
 level=0
+music_sync=nil
 
 function trigger_death()
 
@@ -48,6 +49,7 @@ function trigger_win()
 	if level <1 then
 		level +=1
 		win = nil
+		next = true
 		waiting=true
 
 		cls(0)
@@ -59,7 +61,7 @@ function trigger_win()
 		print("you won", 30, 40)
 		print("score: "..coins, 30, 60)
 
-		print("press 'c' to restart", 30, 100)
+		print("press 'x' to restart", 30, 100)
 		waiting=true
 	end
 end
@@ -97,7 +99,6 @@ end
 --assumes tile flag 0 == solid
 --assumes sprite size of 8x8
 function collide_side(self)
-
 	local offset=self.w/3
 	for i=-(self.w/3),(self.w/3),2 do
 		--if self.dx>0 then
@@ -159,7 +160,7 @@ end
 --assumes tile flag 0 or 1 == solid
 function collide_floor(self)
 	--only check for ground when falling.
-	if self.dy<0 or self.y >= (level+1) *128 -self.w/2 then
+	if self.dy<0 or self.y >= (level+1) *128 -self.w/2 or self.y < level*128 then
 		return false
 	end
 	local landed=false
@@ -185,7 +186,7 @@ function collide_roof(self)
 	--check for collision at multiple points along the top
 	--of the sprite: left, center, and right.
 	for i=-(self.w/3),(self.w/3),2 do
-		if fget(mget((self.x+i)/8,(self.y)/8),0) then
+		if fget(mget((self.x+i)/8,(self.y)/8),0) and self.y > level*128  then
 			self.dy=0
 			self.y=flr((self.y-(self.h/2))/8)*8+8+(self.h/2)
 			self.jump_hold_time=0
@@ -710,7 +711,7 @@ function m_cam(target)
 			if self:pull_min_x()>self.tar.x then
 				self.pos.x+=min((self.tar.x-self:pull_min_x()),4)
 			end
-			self.pos.y = flr(self.tar.y/128)*128+64
+			self.pos.y = level*128+64
 
 
 			--lock to edge
@@ -762,12 +763,26 @@ end
 --state. use this instead of
 --_init()
 function reset()
+
+    if sub(stat(6), 1,1) == "1" then
+        level=1
+        startscreen=false
+		waiting = false
+	elseif stat(6) then
+		startscreen=false
+		waiting = false
+    else
+        startscreen=true
+        waiting=true
+    end
 	enemies = {}
 
-	p1=m_player(40,50 + level*128)
+    p1=m_player(40,70 + level*128)
 	p1:set_anim("walk")
 	cam=m_cam(p1)
-	if(level == 1)	music(24)
+
+	music(sub(stat(6), 2, 2000))
+
 end
 
 
@@ -808,8 +823,17 @@ end
 function _update60()
 	if btn(5) and btn(4) then
 		run()
-	elseif( dead or win )and btn(4) then
-		run()
+	elseif not music_sync and (dead or win or next )and btn(5) then
+		st=stat(24)
+		if next then
+			run(level..24 )
+		end
+		music_sync = st
+	end
+	if music_sync then
+		if music_sync != stat(24) then
+			run(level..music_sync+1)
+		end
 	end
 
 	if waiting then
@@ -846,7 +870,15 @@ function juggle(tilex, tiley, posy, height,offset)
 end
 
 function _draw()
-	if startscreen then
+	if music_sync then
+		cls(0)
+		status=""
+		j=flr(stat(26)/100)
+		for i =1,j do
+			status = status.."."
+	    end
+		print(status, 50, 70, 9)
+    elseif startscreen then
 		cls(0)
 		print("jump with 'x'", 10, 20, 9)
 		print("move with  ⬅️ and ➡️", 10, 40, 9)
@@ -869,7 +901,7 @@ function _draw()
 			cls(0)
 			pal()
 			print("you are dead", 30, 40)
-			print("press 'c' to restart", 30, 60)
+			print("press 'x' to restart ", 30, 60)
 		end
 	else
 
@@ -910,7 +942,7 @@ function _draw()
 		end
 		--hud
 		camera(0,0)
-		print(coins ,64,4,7,0,0)
+		print(coins.." "..level.." "..sub(stat(6), 1,1),64,4,7,0,0)
 	end
 end
 __gfx__
@@ -1173,3 +1205,4 @@ __music__
 00 5b1f212b
 02 2c60626c
 
+ 
