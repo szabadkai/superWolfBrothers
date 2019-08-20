@@ -873,11 +873,16 @@ function _draw()
 	if music_sync then
 		cls(0)
 		status=""
-		j=flr(stat(26)/100)
-		for i =1,j do
+		padding=""
+		j=flr(stat(26)/60)
+		for i=1,j do
 			status = status.."."
-	    end
-		print(status, 50, 70, 9)
+		end
+		for i=j+1,8 do
+			padding = padding.."."
+		end
+		print(status, 50, 70, 11)
+		print(padding, 50+j*4, 70, 4)
     elseif startscreen then
 		cls(0)
 		print("jump with 'x'", 10, 20, 9)
@@ -942,7 +947,7 @@ function _draw()
 		end
 		--hud
 		camera(0,0)
-		print(coins.." "..level.." "..sub(stat(6), 1,1),64,4,7,0,0)
+		print("$ "..coins,10,4,7,0,0)
 	end
 end
 __gfx__
