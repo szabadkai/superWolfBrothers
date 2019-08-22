@@ -55,13 +55,13 @@ function trigger_win()
 		cls(0)
 		pal()
 		print("level 2", 30, 40)
-		print("press 'x' to continue", 30, 60)
+		print("press (x) to continue", 30, 60)
 	else
 		cls(0)
 		print("you won", 30, 40)
 		print("score: "..coins, 30, 60)
 
-		print("press 'x' to restart", 30, 100)
+		print("press (x) to restart", 30, 100)
 		waiting=true
 	end
 end
@@ -768,7 +768,7 @@ function reset()
         level=1
         startscreen=false
 		waiting = false
-	elseif stat(6) then
+	elseif stat(6) != "" then
 		startscreen=false
 		waiting = false
     else
@@ -883,13 +883,25 @@ function _draw()
 		end
 		print(status, 50, 70, 11)
 		print(padding, 50+j*4, 70, 4)
+
+		frame=flr(stat(26)/60)%2
+		if frame == 1 then
+			spr(1, 58,50, 2,2)
+		else
+			spr(3, 58,50, 2,2)
+		end
     elseif startscreen then
 		cls(0)
-		print("jump with 'x'", 10, 20, 9)
-		print("move with  ⬅️ and ➡️", 10, 40, 9)
-		print("find the puppy", 10, 60, 9)
-		print("press x to start", 10, 90, 9)
-
+		print("move - ⬅️ and ➡️", 5, 20, 9)
+		print("jump - (x)", 5, 30, 9)
+		print("double (x) to reach higher", 5, 40, 9)
+		print("reset - (x)(x)", 5, 50, 9)
+		print("find the puppy", 5, 70, 9)
+		print("best with headphones", 5, 80, 9)
+		
+		print("press (x) to start", 5, 96, 7)
+		s= flr(stat(26)/60)%2==1 and 29 or 30
+		spr(s,65,68)
 		if btn(5) then
 			startscreen = false
 			waiting = false
@@ -906,7 +918,7 @@ function _draw()
 			cls(0)
 			pal()
 			print("you are dead", 30, 40)
-			print("press 'x' to restart ", 30, 60)
+			print("press (x) to restart ", 30, 60)
 		end
 	else
 
