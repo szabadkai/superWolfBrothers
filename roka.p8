@@ -23,7 +23,7 @@ backdrop={
 	{0	,102*8},
 	{8*66,1100}
 }
-level=0
+level=1
 music_sync=nil
 
 function trigger_death()
@@ -102,13 +102,13 @@ function collide_side(self)
 	local offset=self.w/3
 	for i=-(self.w/3),(self.w/3),2 do
 		--if self.dx>0 then
-		if fget(mget((self.x+(offset))/8,(self.y+i)/8),0) then
+		if fget(mget((self.x+(offset))/8,(self.y+i)/8),0) and self.y > level*128+8 then
 			self.dx=0
 			self.x=(flr(((self.x+(offset))/8))*8)-(offset)
 			return true
 		end
 		--elseif self.dx<0 then
-		if fget(mget((self.x-(offset))/8,(self.y+i)/8),0) then
+		if fget(mget((self.x-(offset))/8,(self.y+i)/8),0) and self.y > level*128+8 then
 			self.dx=0
 			self.x=(flr((self.x-(offset))/8)*8)+8+(offset)
 			return true
@@ -273,7 +273,7 @@ function m_actor(x,y,tile)
 		draw=function(self)
 				local a=self.anims[self.curanim]
 				local frame=a.frames[self.curframe]
-
+				
 				spr(frame,
 				self.x,
 				self.y,
@@ -656,7 +656,7 @@ function m_player(x,y)
 			if self.x<8 then
 				self.x = 8
 			elseif self.x>1018 then
-				self.x=1018
+				self.x = 1018
 			end
 			if self.y>=(level+1)*128-8 then
 				dead=true
@@ -672,6 +672,13 @@ function m_player(x,y)
 			self.w/8,self.h/8,
 			self.flipx,
 			false)
+			-- pset(self.x,self.y, 8)
+			-- offset=self.w/3
+			-- for i=-(self.w/3),(self.w/3),2 do
+			-- 	pset((self.x-offset),(self.y+i), 11)
+			-- 	pset((self.x+offset),(self.y+i), 11)
+			-- end
+
 		end,
 	}
 
@@ -895,7 +902,7 @@ function _draw()
 		print("move - ⬅️ and ➡️", 5, 20, 9)
 		print("jump - (x)", 5, 30, 9)
 		print("double (x) to reach higher", 5, 40, 9)
-		print("reset - (x)(x)", 5, 50, 9)
+		print("reset - (x)(c)", 5, 50, 9)
 		print("find the puppy", 5, 70, 9)
 		print("best with headphones", 5, 80, 9)
 		
