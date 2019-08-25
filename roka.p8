@@ -772,7 +772,7 @@ end
 function reset()
 
     if sub(stat(6), 1,1) == "1" then
-        level=1
+        level=0
         startscreen=false
 		waiting = false
 	elseif stat(6) != "" then
